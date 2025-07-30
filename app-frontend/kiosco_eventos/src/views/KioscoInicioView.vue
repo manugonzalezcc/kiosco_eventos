@@ -80,13 +80,27 @@ const mostrarAdmin = ref(false)
 const adminPassword = ref('')
 const msgAdmin = ref('')
 const mostrarKioscos = ref(false)
-const kioscos = ref([])
+interface Kiosco {
+  id: number
+  nombre: string
+  responsable: string
+  fecha_inicio: string
+}
+
+interface Venta {
+  id: number
+  producto: string
+  cantidad: number
+  precio: number
+}
+
+const kioscos = ref<Kiosco[]>([])
 const esAdmin = ref(false)
-const kioscoSeleccionado = ref(null)
-const ventasKiosco = ref([])
+const kioscoSeleccionado = ref<Kiosco | null>(null)
+const ventasKiosco = ref<Venta[]>([])
 const totalVentas = ref(0)
 const inversion = ref(0)
-const inversionRegistrada = ref(null)
+const inversionRegistrada = ref<number | null>(null)
 
 async function cargarKioscos() {
   const res = await fetch('http://localhost:8000/kioscos/listar')
@@ -158,7 +172,7 @@ async function loginAdmin() {
   }
 }
 
-async function seleccionarKiosco(kiosco) {
+async function seleccionarKiosco(kiosco: Kiosco) {
   kioscoSeleccionado.value = kiosco
   // Obtén las ventas de ese kiosco desde el backend
   const res = await fetch(`http://localhost:8000/ventas/kiosco/${kiosco.id}`)
@@ -182,7 +196,7 @@ async function registrarInversion() {
       inversion: inversion.value
     }),
   })
-  const data = await res.json()
+  await res.json()
   inversionRegistrada.value = inversion.value
   // Opcional: mostrar mensaje data.msg
 }

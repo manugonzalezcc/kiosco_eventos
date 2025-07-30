@@ -18,15 +18,21 @@ class KioscoController(Controller):
     @post("/iniciar")
     async def iniciar(self, data: KioscoInicio) -> dict:
         db = SessionLocal()
-        kiosco = Kiosco(
-            nombre=data.nombre,
-            responsable=data.responsable,
-            fecha_inicio=data.fecha_inicio
-        )
-        db.add(kiosco)
-        db.commit()
-        db.close()
-        return {"msg": "Kiosco iniciado correctamente", "id": kiosco.id}
+        try:
+            kiosco = Kiosco(
+                nombre=data.nombre,
+                responsable=data.responsable,
+                fecha_inicio=data.fecha_inicio
+            )
+            db.add(kiosco)
+            db.commit()
+            return {"msg": "Kiosco iniciado correctamente", "id": kiosco.id}
+        except Exception as e:
+            print("ERROR AL INICIAR KIOSCO:", e)
+            db.rollback()
+            return {"msg": "Error interno al iniciar kiosco"}
+        finally:
+            db.close()
 
     @post("/registrar-inversion")
     async def registrar_inversion(self, data: dict) -> dict:
